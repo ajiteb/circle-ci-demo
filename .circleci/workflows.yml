@@ -71,7 +71,7 @@ jobs:
           steps:
             - run:
                 command: |
-                  echo "${CIRCLE_BRANCH}"
+                  echo "latest"
 
   scan:
     parameters:
