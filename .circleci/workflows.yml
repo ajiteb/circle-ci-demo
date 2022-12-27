@@ -59,7 +59,7 @@ jobs:
 
       - unless:
           condition:
-            equal: [ "main", << parameters.branch_name >> ]
+            equal: [ main, << pipeline.git.branch >> ]
           steps:
             - run:
                 command: |
@@ -67,7 +67,7 @@ jobs:
 
       - when:
           condition:
-            equal: [ "main", << parameters.branch_name >> ]
+            equal: [ main, << pipeline.git.branch >> ]
           steps:
             - run:
                 command: |
