@@ -1,0 +1,121 @@
+---
+version: 2.1
+
+parameters:
+  build_ubuntu:
+    type: boolean
+    default: true
+
+executors:
+
+  base:
+    docker:
+      - image: cimg/base:2022.09
+    resource_class: small
+
+  scan:
+    docker:
+      - image: a8j8i8t8/ubuntu:22.04-devops
+    resource_class: small
+
+orbs:
+  aws-cli: circleci/aws-cli@3.1.4
+  aws-ecr: circleci/aws-ecr@8.1.3
+
+
+jobs:
+  build-and-push-generic:
+    parameters:
+      rebuild_required:
+        type: boolean
+        default: true
+      branch_name:
+        type: string
+      label:
+        type: string
+      working_directory:
+        type: string
+      before_build:
+        type: steps
+        default: []
+      executor:
+        type: executor
+
+    executor: << parameters.executor >>
+
+    steps:
+      - attach_workspace:
+          at: ./
+      - when:
+          condition:
+            equal:
+              - << parameters.rebuild_required >>
+              - true
+          steps:
+            - steps: << parameters.before_build >>
+            - run:
+                command: |
+                  echo "build"
+
+      - unless:
+          condition:
+            equal: [ "main", << parameters.branch_name >> ]
+          steps:
+            - run:
+                command: |
+                  echo "${CIRCLE_BRANCH}"
+
+      - when:
+          condition:
+            equal: [ "main", << parameters.branch_name >> ]
+          steps:
+            - run:
+                command: |
+                  echo "${CIRCLE_BRANCH}"
+
+  scan:
+    parameters:
+      rebuild_required:
+        type: boolean
+        default: true
+      branch_name:
+        type: string
+      label:
+        type: string
+      working_directory:
+        type: string
+      before_build:
+        type: steps
+        default: []
+      executor:
+        type: executor
+
+    executor: << parameters.executor >>
+
+    steps:
+      - when:
+          condition:
+            equal:
+              - << parameters.rebuild_required >>
+              - true
+          steps:
+            - steps: << parameters.before_build >>
+            - run:
+                name: Scan image
+                command: |
+                  echo "scan"
+
+workflows:
+  build:
+    jobs:
+
+      - build-and-push-generic:
+          name: ubuntu build and push
+          rebuild_required: << pipeline.parameters.build_ubuntu >>
+          label: ubuntu
+          working_directory: ./
+          branch_name: ${CIRCLE_BRANCH}
+          executor: base
+          context:
+            - common
+            - development
