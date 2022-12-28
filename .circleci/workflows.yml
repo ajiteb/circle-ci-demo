@@ -4,7 +4,7 @@ version: 2.1
 parameters:
   build_ubuntu:
     type: boolean
-    default: false
+    default: true
 
 executors:
 
