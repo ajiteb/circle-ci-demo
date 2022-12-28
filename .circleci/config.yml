@@ -9,4 +9,4 @@ workflows:
           base-revision: main
           config-path: .circleci/workflows.yml
           mapping: |
-            ./README.md build_ubuntu false   
+            .circleci/* build_ubuntu true   
