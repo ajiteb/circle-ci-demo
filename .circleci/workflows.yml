@@ -103,6 +103,7 @@ jobs:
 
 workflows:
   build:
+    when: << pipeline.parameters.build_ubuntu >>
     jobs:
 
       - build-and-push-generic:
